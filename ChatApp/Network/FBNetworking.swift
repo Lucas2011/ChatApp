@@ -32,7 +32,7 @@ class FBNetworking {
     
     func fetchUserSingleEvent(webType:webType,subChild:String,completion:@escaping WebResponse){
         
-        let uid = String(Auth.auth().currentUser!.uid)
+        guard let uid = Auth.auth().currentUser?.uid else {return}
         let ref = Database.database().reference()
 
         switch webType {

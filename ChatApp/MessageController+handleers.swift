@@ -107,6 +107,7 @@ extension MessageController{
             print(err.localizedDescription)
         }
         let controller = UINavigationController(rootViewController: LoginViewController())
+        controller.modalPresentationStyle = .fullScreen
         present(controller, animated: true, completion: nil)
     }
 
