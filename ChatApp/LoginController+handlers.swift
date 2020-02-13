@@ -15,6 +15,7 @@ extension LoginViewController:UIImagePickerControllerDelegate, UINavigationContr
     @objc func selectImg(){
 
         let picker = UIImagePickerController()
+        picker.modalPresentationStyle = .fullScreen
         picker.delegate = self
         picker.allowsEditing = true
         present(picker, animated: true, completion: nil)
@@ -50,13 +51,6 @@ extension LoginViewController:UIImagePickerControllerDelegate, UINavigationContr
     @objc func handleRegister(){
         guard let email  = emailTextFiled.text , let password = passwordTextFiled.text, let name = nameTextFiled.text else {return}
         
-        guard let image = profileImg.image else {
-            let alert = UIAlertController(title: "Error", message: "Please uplodate a profile picture", preferredStyle: .alert)
-            let act = UIAlertAction(title: "ok", style: .default, handler: nil)
-            alert.addAction(act)
-            self.present(alert, animated: true, completion: nil)
-            return
-        }
         
         Auth.auth().createUser(withEmail: email, password: password) { [weak self] (res, err) in
             if err != nil{
@@ -66,28 +60,41 @@ extension LoginViewController:UIImagePickerControllerDelegate, UINavigationContr
             
             guard let uid = res?.user.uid else {return}
 
-            //unique imageName
-            let imgName = NSUUID().uuidString
-            //upload Data
-            let storageRef = Storage.storage().reference().child("profileImages").child("\(imgName).png")
-           
-            //adjust profile imamge rate 0.3
-            if let uploadingImg = image.jpegData(compressionQuality:0.3){
-                storageRef.putData(uploadingImg, metadata: nil, completion: { [weak self](metadata, err) in
-                    guard let _ = metadata else {return}
-                 
-                    storageRef.downloadURL(completion: { (url, err) in
-                        guard let url = url?.absoluteString else {return}
-                        let value = ["name":name , "email":email,"profileImgUrl":url]
-                        self?.registerUsersIntoDataBaseWithUID(values: value,uid: uid)
-                    })
-                    
-                })
-            }
-            
-            
+//            self?.updateImge(name: name, email:email,uid: uid)
 
         }
+    }
+    
+    private func updateImge(name:String,email:String,uid:String){
+        
+        guard let image = profileImg.image else {
+            let alert = UIAlertController(title: "Error", message: "Please uplodate a profile picture", preferredStyle: .alert)
+            let act = UIAlertAction(title: "ok", style: .default, handler: nil)
+            alert.addAction(act)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
+         //unique imageName
+         let imgName = NSUUID().uuidString
+         //upload Data
+         let storageRef = Storage.storage().reference().child("profileImages").child("\(imgName).png")
+        
+         //adjust profile imamge rate 0.3
+         if let uploadingImg = image.jpegData(compressionQuality:0.3){
+             storageRef.putData(uploadingImg, metadata: nil, completion: { [weak self](metadata, err) in
+                 guard let _ = metadata else {return}
+              
+                 storageRef.downloadURL(completion: { (url, err) in
+                     guard let url = url?.absoluteString else {return}
+                     let value = ["name":name , "email":email,"profileImgUrl":url]
+                     self?.registerUsersIntoDataBaseWithUID(values: value,uid: uid)
+                 })
+                 
+             })
+         }
+
+
+        
     }
     
     private func registerUsersIntoDataBaseWithUID(values:[String:Any],uid:String){
@@ -115,8 +122,10 @@ extension LoginViewController:UIImagePickerControllerDelegate, UINavigationContr
                 self?.errDetail(err: err!)
                 return
             }
-            self?.present(UINavigationController(rootViewController: MessageController()), animated: true, completion: nil)
-            //sucessfully logged in our user
+            let nav = UINavigationController(rootViewController: MessageController())
+            
+            nav.modalPresentationStyle = .fullScreen
+            self?.present(nav, animated: true, completion: nil)            //sucessfully logged in our user
 //            self?.dismiss(animated: true, completion: nil)
             
         }

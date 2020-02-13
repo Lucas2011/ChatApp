@@ -94,6 +94,7 @@ extension MessageController{
     @objc func pushToChatController(){
         if navigationItem.title == ""{return}
         let view = ChatLogController()
+        view.modalPresentationStyle = .fullScreen
         navigationController?.pushViewController(view, animated: true)
         
     }

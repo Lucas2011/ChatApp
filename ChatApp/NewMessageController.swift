@@ -69,6 +69,7 @@ class NewMessageController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let chatView = ChatLogController()
+        chatView.modalPresentationStyle = .fullScreen
         chatView.User = userList[indexPath.row]
         navigationController?.pushViewController(chatView, animated: true)
     }

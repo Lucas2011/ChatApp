@@ -16,6 +16,7 @@ class ChatLogController: UIViewController,UITextFieldDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.modalPresentationStyle = .fullScreen
         view.backgroundColor = .white
         navigationItem.title = User?.name
         setupUI()
